@@ -1,0 +1,11 @@
+version: '3.9'
+
+services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.prod
+    image: react-prod-image
+    ports:
+      - '9090:80'
+    container_name: react-prod-app

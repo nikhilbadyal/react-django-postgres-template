@@ -1,0 +1,46 @@
+version: '3.9'
+
+services:
+  db:
+    image: postgres:14-alpine
+    container_name: postgresdb
+    restart: always
+    ports:
+      - '5432:5432'
+    volumes:
+      - ./data/db:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_NAME=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    image: django-image
+    command: python manage.py runserver 0.0.0.0:8000
+    ports:
+      - '8000:8000'
+    container_name: django-app
+    volumes:
+      - ./backend:/app
+    environment:
+      - POSTGRES_NAME=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    depends_on:
+      - db
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    image: react-image
+    ports:
+      - '3000:3000'
+    container_name: react-app
+    stdin_open: true
+    tty: true
+    depends_on:
+      - backend
